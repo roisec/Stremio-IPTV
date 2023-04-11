@@ -9,6 +9,6 @@ app.listen((config.port), function () {
     console.log(`HTTP addon accessible at: ${config.local}/configure`);
 });
 
-if(process.env.NODE_ENV){
-    publishToCentral(`${config.local}/manifest.json`)
-}
+// if(process.env.NODE_ENV){
+//     publishToCentral(`${config.local}/manifest.json`)
+// }
