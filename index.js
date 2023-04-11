@@ -43,7 +43,7 @@ app.get('/manifest.json', (_, res) => {
 app.get('/:configuration/manifest.json', (req, res) => {
 	//let manifesto = manifest;
 	manifest.catalogs = [];
-	configuration = atob(req.params.configuration)
+	configuration = Buffer.from(req.params.configuration).toString('base64')
 	let { providors, costume, costumeLists } = iptv.ConfigCache(req.params.configuration)
 	if (costume) {
 		for (let i = 0; i < costume.length; i++) {
@@ -91,32 +91,32 @@ app.get('/:configuration?/:resource(catalog|meta|stream)/:type/:id/:extra?.json'
 
 
 	console.log(req.params);
-	let { configuration, resource, type, id} = req.params;
-	let extra =  Object.fromEntries(new URLSearchParams(req.params.extra));
+	let { configuration, resource, type, id } = req.params;
+	let extra = Object.fromEntries(new URLSearchParams(req.params.extra));
 	let { providors, costume, costumeLists } = iptv.ConfigCache(configuration)
 	console.log(extra)
 	console.log("costume", costume)
 
 	let region = id.split(":")[1];
-	let costumeList = costumeLists[region] ? atob(costumeLists[region].url) : '';
+	let costumeList = costumeLists[region] ? Buffer.from(costumeLists[region].url).toString('base64') : '';
 
 	if (resource == "catalog") {
 		if ((type == "tv")) {
 			console.log('id', id)
 			console.log("catalog", region);
-			if(extra && extra.search){
+			if (extra && extra.search) {
 				console.log("search", extra.search);
-				iptv.search(region, costumeList,extra.search)
-				.then((metas) => {
-					res.send(JSON.stringify({ metas }));
-					res.end();
-				}).catch(error => console.error(error));
-			}else{
-			iptv.catalog(region, costumeList)
-				.then((metas) => {
-					res.send(JSON.stringify({ metas }));
-					res.end();
-				}).catch(error => console.error(error));
+				iptv.search(region, costumeList, extra.search)
+					.then((metas) => {
+						res.send(JSON.stringify({ metas }));
+						res.end();
+					}).catch(error => console.error(error));
+			} else {
+				iptv.catalog(region, costumeList)
+					.then((metas) => {
+						res.send(JSON.stringify({ metas }));
+						res.end();
+					}).catch(error => console.error(error));
 			}
 		}
 	}

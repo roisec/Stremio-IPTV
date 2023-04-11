@@ -10,19 +10,19 @@ function ConfigCache(config) {
 
         var configuration = configCache.get(config);
         if (!configuration || configuration == undefined) {
-            config = atob(config)
+            config = Buffer.from(config).toString('base64')
             var [providors, costume] = config.split('|');
             var costumeLists = {};
             providors = providors.split('=');
             costume = costume.split('=');
 
-            if (providors && providors[1] && providors[1].length>1) {
+            if (providors && providors[1] && providors[1].length > 1) {
                 providors = providors[1].split(',');
                 providors = [...new Set(providors)];
             } else {
                 providors = null;
             }
-            if (costume && costume[1] && costume[1].length>1) {
+            if (costume && costume[1] && costume[1].length > 1) {
                 costume = costume[1].split(',');
                 for (let i = 0; i < costume.length; i++) {
                     let [id, name, url] = costume[i].split(":")
@@ -136,29 +136,29 @@ async function catalog(region, url) {
     return metas;
 }
 
-async function search(region, url,param) {
-    try{
-    console.log("region", region, "url", url)
-    const metas = [];
-    var iptv = await get_iptv(region, url).catch(error => console.error(error));
-    if(!iptv) throw "error getting data";
-    
-    for (let i = 0; i < iptv.length; i++) {
-        if(iptv[i].name.toLowerCase().match(param.toLowerCase())){
-        metas.push({
-            id: iptv[i].id,
-            name: iptv[i].name,
-            type: "tv",
-            poster: iptv[i].poster,
-            posterShape: 'landscape'
-        });
+async function search(region, url, param) {
+    try {
+        console.log("region", region, "url", url)
+        const metas = [];
+        var iptv = await get_iptv(region, url).catch(error => console.error(error));
+        if (!iptv) throw "error getting data";
+
+        for (let i = 0; i < iptv.length; i++) {
+            if (iptv[i].name.toLowerCase().match(param.toLowerCase())) {
+                metas.push({
+                    id: iptv[i].id,
+                    name: iptv[i].name,
+                    type: "tv",
+                    poster: iptv[i].poster,
+                    posterShape: 'landscape'
+                });
+            }
         }
+        return metas;
     }
-    return metas;
-}
-catch(e){
-    console.error(e);
-}
+    catch (e) {
+        console.error(e);
+    }
 }
 
 async function meta(id, url) {
@@ -187,8 +187,8 @@ async function stream(id, url) {
     };
     if (iptv["behaviorHints"]) {
         stream["behaviorHints"] = iptv["behaviorHints"];
-    }else if(region.match("max")){
-     //   stream["behaviorHints"]= {"notWebReady":true,"proxyHeaders":{"request":{'User-Agent':"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36"}}};
+    } else if (region.match("max")) {
+        //   stream["behaviorHints"]= {"notWebReady":true,"proxyHeaders":{"request":{'User-Agent':"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36"}}};
     }
     return [stream];
 }
